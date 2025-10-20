@@ -24,7 +24,7 @@ coverage/
 .parcel-cache/
 
 # Environment variables / secrets
-.env
+*.env
 .env.*.local
 
 # Editor / OS files
