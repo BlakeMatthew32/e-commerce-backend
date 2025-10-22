@@ -1,9 +1,7 @@
-import dotenv from 'dotenv';
+
 import * as db from './db/index.js';
 
 import express from 'express';
-
-dotenv.config();
 
 const app = express();
 const PORT = 3000;
