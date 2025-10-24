@@ -1,6 +1,9 @@
 import express from 'express';
+import bcrypt from 'bcrypt';
 
 import * as db from '../db/index.js';
+
+const saltRounds = 10;
 
 const registerRouter = express.Router();
 
@@ -14,7 +17,16 @@ registerRouter.post('/', async (req, res, next) => {
     return;
   };
 
-  db.createUser(firstName, lastName, email, password);
+  bcrypt.genSalt(saltRounds, (err, salt) => {
+    bcrypt.hash(password, salt, (err, hash) => {
+      if (err) {
+        throw new Error(err);
+      }
+      console.log(hash);
+      db.createUser(firstName, lastName, email, hash);
+    });
+  });
+
 
   res.send(`User Exists: ${userExists}`);
 });

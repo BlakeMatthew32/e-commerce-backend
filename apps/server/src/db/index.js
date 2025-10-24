@@ -16,12 +16,12 @@ const query = (text, params) => {
 };
 
 const checkUserExists = async (userEmail) => {
-  const results = await pool.query('SELECT * FROM customers WHERE email = $1', [userEmail]);
+  const results = await query('SELECT * FROM customers WHERE email = $1', [userEmail]);
   return (results.rows[0] ? true : false);
 };
 
 const createUser = async (firstName, lastName, email, password) => {
-  const results = await pool.query('INSERT INTO customers (first_name, last_name, email) VALUES ($1, $2, $3);', [firstName, lastName, email]);
+  const results = await query('INSERT INTO customers (first_name, last_name, email) VALUES ($1, $2, $3);', [firstName, lastName, email]);
 }
 
 export { query, checkUserExists, createUser }
