@@ -8,7 +8,7 @@ const saltRounds = 10;
 const registerRouter = express.Router();
 
 registerRouter.post('/', async (req, res, next) => {
-  const { firstName, lastName, email, password, passwordConfirm } = req.body;
+  const { firstName, lastName, email, password } = req.body;
 
   const userExists = await db.checkUserExists(email);
 
@@ -17,14 +17,18 @@ registerRouter.post('/', async (req, res, next) => {
     return;
   };
 
-  bcrypt.genSalt(saltRounds, (err, salt) => {
-    bcrypt.hash(password, salt, (err, hash) => {
-      if (err) {
-        throw new Error(err);
-      }
-      console.log(hash);
-      db.createUser(firstName, lastName, email, hash);
-    });
+  bcrypt.genSalt(saltRounds, (error, salt) => {
+    try {
+      bcrypt.hash(password, salt, (error, hash) => {
+        if (error) {
+          throw new Error(error);
+        }
+        db.createUser(firstName, lastName, email, hash);
+      });
+    } catch (error) {
+      console.log(error);
+    }
+    
   });
 
 

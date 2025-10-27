@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import { Pool } from 'pg';
 
-dotenv.config({debug: true});
+dotenv.config();
 
 const pool = new Pool({
   user: process.env.DB_USER,
@@ -21,7 +21,40 @@ const checkUserExists = async (userEmail) => {
 };
 
 const createUser = async (firstName, lastName, email, password) => {
-  const results = await query('INSERT INTO customers (first_name, last_name, email) VALUES ($1, $2, $3);', [firstName, lastName, email]);
+  const customersResults = await query('INSERT INTO customers (first_name, last_name, email) VALUES ($1, $2, $3) RETURNING id;', [firstName, lastName, email]);
+  const passwordsResults = await query('INSERT INTO passwords (password, customer_id) VALUES ($1, $2);', [password, customersResults.rows[0].id]);
 }
 
-export { query, checkUserExists, createUser }
+const getUserByEmail = async (email) => {
+  try {
+    const customersResults = await query('SELECT * FROM customers WHERE email = $1;', [email]);
+    const passwordsResults = await query('SELECT password FROM passwords where customer_id = $1', [customersResults.rows[0].id]);
+
+    const user = {
+      ...customersResults.rows[0],
+      ...passwordsResults.rows[0]
+    }
+
+    return user;
+  } catch (error) {
+    return null;
+  }
+};
+
+const getUserById = async (id) => {
+  try {
+    const customersResults = await query('SELECT * FROM customers WHERE email = $1;', [email]);
+    const passwordsResults = await query('SELECT password FROM passwords where customer_id = $1', [customersResults.rows[0].id]); 
+    
+    const user = {
+      ...customersResults.rows[0],
+      ...passwordsResults.rows[0]
+    }
+
+    return user;
+  } catch (error) {
+    return null;
+  }
+}
+
+export { query, checkUserExists, createUser, getUserByEmail, getUserById }
