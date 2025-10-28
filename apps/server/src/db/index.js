@@ -27,13 +27,9 @@ const createUser = async (firstName, lastName, email, password) => {
 
 const getUserByEmail = async (email) => {
   try {
-    const customersResults = await query('SELECT * FROM customers WHERE email = $1;', [email]);
-    const passwordsResults = await query('SELECT password FROM passwords where customer_id = $1', [customersResults.rows[0].id]);
+    const results = await query('SELECT * FROM customers JOIN passwords ON customers.id = passwords.customer_id WHERE customers.email = $1;', [email]);
 
-    const user = {
-      ...customersResults.rows[0],
-      ...passwordsResults.rows[0]
-    }
+    const user = results.rows[0];
 
     return user;
   } catch (error) {
@@ -43,13 +39,9 @@ const getUserByEmail = async (email) => {
 
 const getUserById = async (id) => {
   try {
-    const customersResults = await query('SELECT * FROM customers WHERE email = $1;', [email]);
-    const passwordsResults = await query('SELECT password FROM passwords where customer_id = $1', [customersResults.rows[0].id]); 
+    const results = await query('SELECT * FROM customers JOIN passwords ON customers.id = passwords.customer_id WHERE customers.id = $1;', [id])
     
-    const user = {
-      ...customersResults.rows[0],
-      ...passwordsResults.rows[0]
-    }
+    const user = results.rows[0];
 
     return user;
   } catch (error) {

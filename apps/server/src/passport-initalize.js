@@ -12,7 +12,7 @@ const initializePassport = (passport, getUserByEmail, getUserById) => {
       if (await bcrypt.compare(password, user.password)) {
         return done(null, user);
       } else {
-        return done(null, false, { message: 'Password Incorrect.' });
+        return done(null, false, { message: 'Incorrect Password.' });
       }
     } catch (error) {
       done(error)
@@ -25,8 +25,13 @@ const initializePassport = (passport, getUserByEmail, getUserById) => {
     return done(null, user.id)
   });
 
-  passport.deserializeUser((id, done) => {
-    return done(null, getUserById(id));
+  passport.deserializeUser(async (id, done) => {
+    try {
+      const user = await getUserById(id);
+      done(null, user);
+    } catch (error) {
+      done(error);
+    }
   });
 
 }

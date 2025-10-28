@@ -23,31 +23,11 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
-
 app.use(passport.initialize());
 app.use(passport.session());
 
 
 app.use(express.json());
-
-app.get('/products', async (req, res, next) => {
-  const result = await db.query('SELECT * FROM products LIMIT 10;');
-  res.send(result.rows);
-});
-
-app.get('/login_failed', (req, res) => {
-  res.json({login: false})
-});
-
-app.get('/login_success', (req, res) => {
-  console.log(req.user)
-  res.json({login: true});
-});
-
-app.get('/logout_success', (req, res) => {
-  console.log(req.user);
-  res.json({login: false});
-});
 
 app.use('/users', usersRouter);
 
