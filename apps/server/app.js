@@ -6,6 +6,7 @@ import {initializePassport} from './src/passport-initalize.js';
 import * as db from './src/db/index.js';
 
 import usersRouter from './src/routes/users.js';
+import productsRouter from './src/routes/products.js';
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
@@ -23,6 +24,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -30,6 +32,8 @@ app.use(passport.session());
 app.use(express.json());
 
 app.use('/users', usersRouter);
+
+app.use('/products', productsRouter);
 
 
 app.listen(PORT, (error) => {

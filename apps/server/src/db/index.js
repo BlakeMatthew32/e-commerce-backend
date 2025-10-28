@@ -15,6 +15,15 @@ const query = (text, params) => {
   return pool.query(text, params);
 };
 
+// Products database actions
+
+const getAllProducts = async () => {
+  const results = await query('SELECT * FROM products;');
+  return results.rows
+}
+
+
+// Rgistration and login database actions
 const checkUserExists = async (userEmail) => {
   const results = await query('SELECT * FROM customers WHERE email = $1', [userEmail]);
   return (results.rows[0] ? true : false);
@@ -49,4 +58,4 @@ const getUserById = async (id) => {
   }
 }
 
-export { query, checkUserExists, createUser, getUserByEmail, getUserById }
+export { getAllProducts, checkUserExists, createUser, getUserByEmail, getUserById }
