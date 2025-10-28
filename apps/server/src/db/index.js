@@ -22,6 +22,16 @@ const getAllProducts = async () => {
   return results.rows
 }
 
+const getProductsByCategory = async (category) => {
+  const results = await query('SELECT * FROM products WHERE category ILIKE $1', [category]);
+  return results.rows;
+}
+
+const getProductById = async (id) => {
+  const results = await query('SELECT * FROM products WHERE id = $1', [id]);
+  return results.rows[0];
+}
+
 
 // Rgistration and login database actions
 const checkUserExists = async (userEmail) => {
@@ -58,4 +68,4 @@ const getUserById = async (id) => {
   }
 }
 
-export { getAllProducts, checkUserExists, createUser, getUserByEmail, getUserById }
+export { getAllProducts,getProductsByCategory, getProductById, checkUserExists, createUser, getUserByEmail, getUserById }
