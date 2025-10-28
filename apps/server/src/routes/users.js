@@ -48,7 +48,6 @@ usersRouter.post('/logout', (req, res) => {
   });
 });
 
-
 //route to check login functionality
 
 usersRouter.get("/me", (req, res) => {
