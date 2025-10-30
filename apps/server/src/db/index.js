@@ -15,6 +15,25 @@ const query = (text, params) => {
   return pool.query(text, params);
 };
 
+// Products database actions
+
+const getAllProducts = async () => {
+  const results = await query('SELECT * FROM products;');
+  return results.rows
+}
+
+const getProductsByCategory = async (category) => {
+  const results = await query('SELECT * FROM products WHERE category ILIKE $1', [category]);
+  return results.rows;
+}
+
+const getProductById = async (id) => {
+  const results = await query('SELECT * FROM products WHERE id = $1', [id]);
+  return results.rows[0];
+}
+
+
+// Rgistration and login database actions
 const checkUserExists = async (userEmail) => {
   const results = await query('SELECT * FROM customers WHERE email = $1', [userEmail]);
   return (results.rows[0] ? true : false);
@@ -49,4 +68,4 @@ const getUserById = async (id) => {
   }
 }
 
-export { query, checkUserExists, createUser, getUserByEmail, getUserById }
+export { getAllProducts,getProductsByCategory, getProductById, checkUserExists, createUser, getUserByEmail, getUserById }
