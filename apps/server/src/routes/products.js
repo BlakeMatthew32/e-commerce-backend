@@ -8,7 +8,6 @@ productsRouter.get('/', async (req, res, next) => {
   const category = req.query.category;
 
   let products = [];
-  console.log(category)
 
   if(!category) {
     products = await getAllProducts();

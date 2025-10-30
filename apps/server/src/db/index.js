@@ -34,6 +34,7 @@ const getProductById = async (id) => {
 
 
 // Rgistration and login database actions
+
 const checkUserExists = async (userEmail) => {
   const results = await query('SELECT * FROM customers WHERE email = $1', [userEmail]);
   return (results.rows[0] ? true : false);
@@ -58,7 +59,12 @@ const getUserByEmail = async (email) => {
 
 const getUserById = async (id) => {
   try {
-    const results = await query('SELECT * FROM customers JOIN passwords ON customers.id = passwords.customer_id WHERE customers.id = $1;', [id])
+    const results = await query(
+      `SELECT * FROM customers
+       JOIN passwords ON customers.id = passwords.customer_id 
+       WHERE customers.id = $1;`, 
+       [id]
+    );
     
     const user = results.rows[0];
 
@@ -66,6 +72,72 @@ const getUserById = async (id) => {
   } catch (error) {
     return null;
   }
+};
+
+// user accout actions 
+
+const getUserInfo = async (userId) => {
+  const user = await getUserById(userId).rows[0];
+  const userInfo = {
+    name: `${user.first_name} ${user.last_name}`,
+    email: user.email,
+  };
+
+  return userInfo;
+};
+
+const getUserOrders = async (userId) => {
+  const userOrders = await query('SELECT * FROM orders WHERE customer_id = $1;', [userId]).rows;
+  return userOrders;
 }
 
-export { getAllProducts,getProductsByCategory, getProductById, checkUserExists, createUser, getUserByEmail, getUserById }
+const getUserAddressInfomation = async (userId) => {
+  const userAddressInfo = await query(
+    `SELECT * FROM addresses
+     JOIN addresses_customers
+     ON addresses.id = addresses_customers.addresses_id 
+     WHERE addresses_customers.customer_id = $1;`,
+     [userId]
+  ).rows;
+  console.log(userAddressInfo)
+}
+
+const addUserAddress = async (addressInfo, userId) => {
+  const {nameNumber, street, city, county, country, postalCode} = addressInfo;
+  const results = await query(`
+    INSERT INTO addresses (name_number, street, city, county, country, postal_code)
+    VALUES (
+      $1,
+      $2,
+      $3,
+      $4,
+      $5
+    )
+      RETURNING *;
+    `, [nameNumber, street, city, county, country, postalCode]);
+    await query(`
+      INSERT INTO addresses_customers (address_id, customer_id)
+      VALUES (
+        $1,
+        $2
+      );`,
+      [results.rows[0].id, userId]
+    );
+
+    
+
+}
+
+export { 
+  getAllProducts,
+  getProductsByCategory, 
+  getProductById, 
+  checkUserExists, 
+  createUser, 
+  getUserByEmail, 
+  getUserById,
+  getUserInfo,
+  getUserOrders,
+  getUserAddressInfomation,
+  addUserAddress,
+};

@@ -48,6 +48,13 @@ usersRouter.post('/logout', (req, res) => {
   });
 });
 
+// user account information 
+
+usersRouter.get('/account', async (req, res, next) => {
+  const userInfo = await getUserInfo(req.user.id);
+
+})
+
 //route to check login functionality
 
 usersRouter.get("/me", (req, res) => {
