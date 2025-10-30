@@ -124,8 +124,6 @@ const addUserAddress = async (addressInfo, userId) => {
       [results.rows[0].id, userId]
     );
 
-    
-
 }
 
 export { 
