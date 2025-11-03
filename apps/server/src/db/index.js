@@ -80,7 +80,6 @@ const getUserOrders = async (userId) => {
 }
 
 const getUserAddressInfomation = async (userId) => {
-  console.log('in get user addresses');
   const userAddressInfo = await query(
     `SELECT * FROM addresses
      JOIN addresses_customers
