@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 
 import registerRouter from './register.js';
-import { addUserAddress, getUserAddressInfomation, getUserOrders } from "../db/index.js";
+import { addUserAddress, getUserAddresses, getUserOrders, removeAddress } from "../db/index.js";
 
 const usersRouter = express.Router();
 
@@ -71,7 +71,7 @@ usersRouter.post('/logout', checkAuth, (req, res) => {
 usersRouter.get('/account', checkAuth, async (req, res, next) => {
   const userId = req.user.id;
   const userOrders = await getUserOrders(userId);
-  const userAddresses = await getUserAddressInfomation(userId);
+  const userAddresses = await getUserAddresses(userId);
   const userInfo = {
     orders: userOrders || [],
     addresses: userAddresses,
@@ -80,11 +80,21 @@ usersRouter.get('/account', checkAuth, async (req, res, next) => {
   res.json(userInfo);
 });
 
-usersRouter.post('/account/address',checkAuth, async (req, res, next) => {
+usersRouter.post('/account/address', checkAuth, async (req, res, next) => {
   const newAddress = req.body.address;
+  // add checks to ensure the address data is correct
   await addUserAddress(newAddress, req.user.id);
   res.status(201).json({
     address: newAddress,
+  });
+});
+
+usersRouter.delete('/account/address/:id', checkAuth, async (req, res, next) => {
+  const addressId = req.params.id;
+  // checks to see if address exists?
+  const successful = await removeAddress(addressId, req.user.id);
+  res.json({
+    message: "Address deleted",
   });
 });
 

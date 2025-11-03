@@ -74,49 +74,55 @@ const getUserById = async (id) => {
   }
 };
 
+// delete user needs to be implemented removing everthing for that user from all tables
+// if orders are outstanding for user this would need to be handled
+
+// Error handling needs to be implemented for all user account opperations
+
 const getUserOrders = async (userId) => {
   const userOrders = await query('SELECT * FROM orders WHERE customer_id = $1;', [userId]).rows;
   return userOrders;
 }
 
-const getUserAddressInfomation = async (userId) => {
+const getUserAddresses = async (userId) => {
   const userAddressInfo = await query(
     `SELECT * FROM addresses
-     JOIN addresses_customers
-     ON addresses.id = addresses_customers.address_id 
-     WHERE addresses_customers.customer_id = $1;`,
+     WHERE addresses.customer_id = $1;`,
      [userId]
   );
   return userAddressInfo.rows;
 };
 
-
-// maybe need too look at db triggers for the second insert of this function
-
 const addUserAddress = async (newAddress, userId) => {
   const {nameNumber, street, city, county, country, postalCode} = newAddress;
   const results = await query(`
-    INSERT INTO addresses (name_number, street, city, county, country, postal_code)
+    INSERT INTO addresses (name_number, street, city, county, country, postal_code, customer_id)
     VALUES (
       $1,
       $2,
       $3,
       $4,
       $5,
-      $6
+      $6,
+      $7
     )
       RETURNING *;
-    `, [nameNumber, street, city, county, country, postalCode]);
-    await query(`
-      INSERT INTO addresses_customers (address_id, customer_id)
-      VALUES (
-        $1,
-        $2
-      );`,
-      [results.rows[0].id, userId]
-    );
+    `, [nameNumber, street, city, county, country, postalCode, userId]);
+};
 
-}
+// maybe the address table should be a one to many relationship, one customer to many addresses? 
+// could mean that the same address can appear in the table, but means that each user wuld have there own
+// addresses, makes it easier to delete them for a given user
+
+const removeAddress = async (addressId, userId) => {
+  // remove the address for the current user only,
+  //if that address is also used for other users do not remove it for them
+  const results = await query(`
+    DELETE FROM addresses
+    WHERE id = $1 AND customer_id = $2;
+  `, [addressId, userId]);
+  console.log(results);
+};
 
 export { 
   getAllProducts,
@@ -127,6 +133,7 @@ export {
   getUserByEmail, 
   getUserById,
   getUserOrders,
-  getUserAddressInfomation,
+  getUserAddresses,
   addUserAddress,
+  removeAddress,
 };
