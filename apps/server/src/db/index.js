@@ -82,7 +82,11 @@ const getUserById = async (id) => {
 const getUserOrders = async (userId) => {
   const userOrders = await query('SELECT * FROM orders WHERE customer_id = $1;', [userId]).rows;
   return userOrders;
-}
+};
+
+// get specific order and products from order
+
+// request order cancalation 
 
 const getUserAddresses = async (userId) => {
   const userAddressInfo = await query(
