@@ -74,36 +74,28 @@ const getUserById = async (id) => {
   }
 };
 
-// user accout actions 
-
-const getUserInfo = async (userId) => {
-  const user = await getUserById(userId).rows[0];
-  const userInfo = {
-    name: `${user.first_name} ${user.last_name}`,
-    email: user.email,
-  };
-
-  return userInfo;
-};
-
 const getUserOrders = async (userId) => {
   const userOrders = await query('SELECT * FROM orders WHERE customer_id = $1;', [userId]).rows;
   return userOrders;
 }
 
 const getUserAddressInfomation = async (userId) => {
+  console.log('in get user addresses');
   const userAddressInfo = await query(
     `SELECT * FROM addresses
      JOIN addresses_customers
-     ON addresses.id = addresses_customers.addresses_id 
+     ON addresses.id = addresses_customers.address_id 
      WHERE addresses_customers.customer_id = $1;`,
      [userId]
-  ).rows;
-  console.log(userAddressInfo)
-}
+  );
+  return userAddressInfo.rows;
+};
 
-const addUserAddress = async (addressInfo, userId) => {
-  const {nameNumber, street, city, county, country, postalCode} = addressInfo;
+
+// maybe need too look at db triggers for the second insert of this function
+
+const addUserAddress = async (newAddress, userId) => {
+  const {nameNumber, street, city, county, country, postalCode} = newAddress;
   const results = await query(`
     INSERT INTO addresses (name_number, street, city, county, country, postal_code)
     VALUES (
@@ -111,7 +103,8 @@ const addUserAddress = async (addressInfo, userId) => {
       $2,
       $3,
       $4,
-      $5
+      $5,
+      $6
     )
       RETURNING *;
     `, [nameNumber, street, city, county, country, postalCode]);
@@ -134,7 +127,6 @@ export {
   createUser, 
   getUserByEmail, 
   getUserById,
-  getUserInfo,
   getUserOrders,
   getUserAddressInfomation,
   addUserAddress,
